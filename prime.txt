@@ -1,0 +1,17 @@
+V24OptionsConverted=1
+WorkPreference=0
+V30OptionsConverted=1
+StressTester=1
+UsePrimenet=0
+TortureHyperthreading=1
+MinTortureFFT=73
+MaxTortureFFT=156
+TortureMem=0
+TortureTime=6
+TortureWeak=0
+DialUp=0
+V5UserID=ANONYMOUS
+
+[PrimeNet]
+Debug=0
+ProxyHost=

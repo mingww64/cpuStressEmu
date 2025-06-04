@@ -51,7 +51,7 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
-
+    
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
             <h1 class="text-2xl md:text-4xl font-bold text-slate-900">A Thermodynamic Investigation of CPU Cooling</h1>
@@ -241,13 +241,38 @@
         </div>
     </div>
 
+    <!-- Page Guide Modal -->
+    <div id="pageGuideModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-xl transform transition-all">
+            <div id="guideHeader" class="mb-4">
+                <h2 id="guideSlideTitle" class="text-2xl font-bold text-slate-800">Welcome!</h2>
+            </div>
+            <div id="guideSlideContent" class="text-slate-700 mb-6 space-y-3 max-h-[60vh] overflow-y-auto">
+                <!-- Slide content will be injected here -->
+            </div>
+            <div id="guideNavigation" class="flex justify-between items-center pt-4 border-t border-slate-200">
+                <button id="guidePrevButton" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors">Previous</button>
+                <span id="guideSlideIndicator" class="text-sm text-slate-500"></span>
+                <div class="flex items-center">
+                    <button id="guideSkipButton" class="text-slate-500 hover:text-slate-700 font-medium py-2 px-4 rounded-lg mr-2 transition-colors">Skip</button>
+                    <button id="guideNextButton" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Next</button>
+                    <button id="guideDoneButton" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors" style="display: none;">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <script>
         let processedData = [];
         const activeCharts = {}; 
 
+        // Declare modelParams and sweetSpotRPM once, early.
+        // Initial values are placeholders, they will be updated upon data load/fitting.
         let modelParams = { C: 12.0157, n: 0.3467, R_fixed: 0.0 }; 
         let sweetSpotRPM = 1967; 
+
         let _isMarkedInitialized = false;
         let heatTransferIntroDismissed = false;
         let mdDataAvailable = false;
@@ -261,10 +286,111 @@
         let heatTransferIntroModal, dismissHeatTransferIntroButton;
         let topUploadContainer, bottomFileUploadArea, bottomCsvFileInput, bottomMdFileInput, bottomCsvFileStatus, bottomMdFileStatus;
 
-
+        // Page Guide Elements & State
+        let pageGuideModal, guideSlideTitle, guideSlideContent, guidePrevButton, guideNextButton, guideSkipButton, guideDoneButton, guideSlideIndicator;
+        let currentDemoSlideIndex = 0;
+        const localStorageKeyDemoSeen = 'cpuStressEmuDemoSeen_v1.0'; // Versioned key
+        
+        // Define model functions after modelParams is declared, and before demoSlides
         const rthModel = (rpm) => modelParams.R_fixed + modelParams.C / Math.pow(rpm, modelParams.n);
         const derivativeModel = (rpm) => -modelParams.n * modelParams.C * Math.pow(rpm, -modelParams.n - 1);
-        
+        const demoSlides = [
+            {
+                title: "Welcome to the CPU Thermal Report!",
+                contentHTML: `
+                    <p>This interactive report helps you explore CPU thermal performance.</p>
+                    <p>Let's take a quick tour of the main features (this will only appear once).</p>
+                `
+            },
+            {
+                title: "1. Loading Data",
+                contentHTML: `
+                    <p>The report starts by attempting to load default experiment data (CSV) and detailed explanations (Markdown) from local files named <code>cpu_cooling_data_processed.csv</code> and <code>exp.md</code>.</p>
+                    <div class="my-3 p-3 border border-slate-300 rounded-md bg-slate-100 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="p-3 bg-white border-2 border-dashed border-slate-300 rounded text-center">
+                                <h4 class="text-sm font-semibold text-slate-700 mb-1">1. Load CSV Data</h4>
+                                <p class="text-slate-500 mb-1">Select a CSV file...</p>
+                                <div class="p-1 bg-slate-200 border border-slate-300 rounded w-4/5 mx-auto">Choose File</div>
+                            </div>
+                            <div class="p-3 bg-white border-2 border-dashed border-slate-300 rounded text-center">
+                                <h4 class="text-sm font-semibold text-slate-700 mb-1">2. Load Details (MD)</h4>
+                                <p class="text-slate-500 mb-1">Select an MD file...</p>
+                                <div class="p-1 bg-slate-200 border border-slate-300 rounded w-4/5 mx-auto">Choose File</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p>If default files aren't found or you wish to use your own, you can use the 'Choose File' buttons shown above (in the main app) or in the 'Change Loaded Files' section at the bottom of the page.</p>
+                    <p>Once CSV data is successfully loaded, the main navigation and content areas will become active.</p>
+                `
+            },
+            {
+                title: "2. Navigating Sections",
+                contentHTML: `
+                    <p>Use the top navigation bar (which appears after data is loaded) to switch between different views:</p>
+                    <div class="my-3 p-2 border-b border-slate-300 bg-slate-100 rounded-t-md">
+                        <ul class="flex flex-wrap justify-center text-xs font-medium text-center text-slate-500">
+                            <li class="mr-1"><button class="inline-block p-2 border-b-2 border-sky-500 text-sky-600 rounded-t-sm">Overview</button></li>
+                            <li class="mr-1"><button class="inline-block p-2 border-b-2 border-transparent rounded-t-sm hover:text-slate-600">Performance</button></li>
+                            <li class="mr-1"><button class="inline-block p-2 border-b-2 border-transparent rounded-t-sm hover:text-slate-600">Model</button></li>
+                            <li><button class="inline-block p-2 border-b-2 border-transparent rounded-t-sm hover:text-slate-600">Details</button></li>
+                        </ul>
+                    </div>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><strong>Overview:</strong> Key findings and a summary of the experiment.</li>
+                        <li><strong>Performance Explorer:</strong> Interactive charts for temperature, power, and fan RPM.</li>
+                        <li><strong>Thermal Model:</strong> Explore the fitted physics-based model, its predictions, and the 'sweet spot' for fan speed.</li>
+                        <li><strong>Experiment Details:</strong> In-depth information, methodology, and analysis (from the loaded Markdown file). This section also includes a brief primer on heat transfer concepts if it's your first time viewing it.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "3. Interactive Charts & Model",
+                contentHTML: `
+                    <p>The 'Performance Explorer' and 'Thermal Model' tabs feature interactive charts.</p>
+                    <div class="my-3 p-3 border border-slate-300 rounded-md bg-white shadow">
+                        <div class="w-full h-32 bg-slate-50 border border-slate-200 rounded flex items-center justify-center relative">
+                            <span class="text-slate-400 italic text-sm">Chart Area Example</span>
+                            <svg viewBox="0 0 100 50" class="absolute w-4/5 h-4/5 opacity-30 pointer-events-none">
+                                <polyline fill="none" stroke="#0ea5e9" stroke-width="2" points="5,45 20,30 40,35 60,15 80,20 95,5" />
+                                <line x1="5" y1="45" x2="95" y2="45" stroke="#94a3b8" stroke-width="1"/>
+                                <line x1="5" y1="45" x2="5" y2="5" stroke="#94a3b8" stroke-width="1"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p>Hover over data points to see detailed values. The charts will update if you load new CSV data.</p>
+                    <p class="mt-3">In the 'Thermal Model' tab, you can also use a slider to see predicted thermal resistance (R<sub>th</sub>) at different RPMs based on the fitted model: <code>R<sub>th</sub> = ${modelParams.R_fixed > 0 ? modelParams.R_fixed.toFixed(3) + " + " : ""}${modelParams.C.toFixed(2)} / RPM<sup>${modelParams.n.toFixed(3)}</sup></code>.</p>
+                    <div class="my-3 p-3 border border-slate-300 rounded-md bg-slate-50 text-xs">
+                        <p class="text-center font-mono text-sky-700 mb-2">R<sub>th</sub> = ${modelParams.R_fixed > 0 ? modelParams.R_fixed.toFixed(3) + " + " : ""}${modelParams.C.toFixed(2)} / RPM<sup>${modelParams.n.toFixed(3)}</sup></p>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-medium w-16 text-right">300 RPM</span>
+                            <input type="range" min="300" max="2500" value="1500" class="w-full h-1.5 bg-slate-300 rounded-lg appearance-none" disabled>
+                            <span class="font-medium w-16 text-left">2500 RPM</span>
+                        </div>
+                        <div class="text-center mt-2">
+                            <p class="text-slate-600">For <span class="font-bold text-slate-800">1500</span> RPM, predicted R<sub>th</sub> is:</p>
+                            <p class="text-xl font-bold text-sky-600 mt-0.5">${rthModel(1500).toFixed(3)} °C/W</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "4. Experiment Details & Markdown",
+                contentHTML: `
+                    <p>The 'Experiment Details' tab renders content from a Markdown (.md) file. This allows for rich text formatting, including equations (using KaTeX), code blocks, lists, and images.</p>
+                    <p>If you load your own Markdown file, ensure it's well-formatted. The system uses the 'marked-katex-extension' for rendering.</p>
+                    <p>The first time you visit the 'Details' tab, an introductory note on heat transfer principles will be shown. You can dismiss it to view the main content.</p>
+                `
+            },
+            {
+                title: "You're All Set!",
+                contentHTML: `
+                    <p>You can now explore the report. If you need to change the loaded data files later, scroll to the bottom of the page to find the 'Change Loaded Files' section.</p>
+                    <p>Enjoy analyzing the CPU thermal performance!</p>
+                `
+            }
+        ];
+
         const showChartOverlays = (show = true) => {
             Object.values(chartOverlays).forEach(overlay => {
                 if (overlay) overlay.style.display = show ? 'flex' : 'none';
@@ -496,6 +622,16 @@
             bottomMdFileInput = document.getElementById('bottomMdFileInput');
             bottomCsvFileStatus = document.getElementById('bottomCsvFileStatus');
             bottomMdFileStatus = document.getElementById('bottomMdFileStatus');
+            
+            // Page Guide UI Elements
+            pageGuideModal = document.getElementById('pageGuideModal');
+            guideSlideTitle = document.getElementById('guideSlideTitle');
+            guideSlideContent = document.getElementById('guideSlideContent');
+            guidePrevButton = document.getElementById('guidePrevButton');
+            guideNextButton = document.getElementById('guideNextButton');
+            guideSkipButton = document.getElementById('guideSkipButton');
+            guideDoneButton = document.getElementById('guideDoneButton');
+            guideSlideIndicator = document.getElementById('guideSlideIndicator');
 
             detailsMarkdownHostDiv = document.getElementById('detailsMarkdownHost');
             detailsFallbackMessageP = document.getElementById('detailsFallbackMessage');
@@ -530,9 +666,62 @@
             showChartOverlays(true);
             initCalculator(); 
             manageDetailsTabContent(); // Initial state for details tab
+            
+            // Initialize Page Guide. It will either show the guide (and load data on dismiss)
+            // or, if already seen, it will trigger data loading.
+            initPageGuide();
 
-            loadDefaultCsv();
-            loadDefaultMd();
+            function renderCurrentDemoSlide() {
+                if (!pageGuideModal || !demoSlides[currentDemoSlideIndex]) return;
+                const slide = demoSlides[currentDemoSlideIndex];
+                guideSlideTitle.textContent = slide.title;
+                guideSlideContent.innerHTML = slide.contentHTML;
+                guideSlideIndicator.textContent = `Step ${currentDemoSlideIndex + 1} of ${demoSlides.length}`;
+
+                guidePrevButton.disabled = currentDemoSlideIndex === 0;
+                guidePrevButton.classList.toggle('opacity-50', currentDemoSlideIndex === 0);
+
+                if (currentDemoSlideIndex === demoSlides.length - 1) {
+                    guideNextButton.style.display = 'none';
+                    guideDoneButton.style.display = 'inline-block';
+                } else {
+                    guideNextButton.style.display = 'inline-block';
+                    guideDoneButton.style.display = 'none';
+                }
+            }
+
+            function dismissPageGuide() {
+                if(pageGuideModal) pageGuideModal.style.display = 'none';
+                localStorage.setItem(localStorageKeyDemoSeen, 'true');
+                
+                // Guide is now dismissed, load default data if it hasn't been successfully loaded yet.
+                if (!defaultCsvLoadedSuccessfully) {
+                    loadDefaultCsv();
+                }
+                if (!defaultMdLoadedSuccessfully) {
+                    loadDefaultMd();
+                }
+            }
+
+            function initPageGuide() {
+                if (localStorage.getItem(localStorageKeyDemoSeen) !== 'true' && pageGuideModal) {
+                    // Guide not seen, show it. Data loading will happen on dismiss.
+                    pageGuideModal.style.display = 'flex';
+                    currentDemoSlideIndex = 0;
+                    renderCurrentDemoSlide();
+                } else {
+                    // Guide already seen (or modal is not available for some reason), 
+                    // hide modal just in case and proceed to load data.
+                    if (pageGuideModal) pageGuideModal.style.display = 'none';
+                    
+                    if (!defaultCsvLoadedSuccessfully) {
+                        loadDefaultCsv(); 
+                    }
+                    if (!defaultMdLoadedSuccessfully) {
+                        loadDefaultMd(); 
+                    }
+                }
+            }
             
             function setupFileReader(file, type, primaryStatusEl, secondaryStatusEl) {
                  if (file) {
@@ -577,6 +766,22 @@
             bottomCsvFileInput.addEventListener('change', (event) => setupFileReader(event.target.files[0], 'csv', bottomCsvFileStatus, csvFileStatus));
             bottomMdFileInput.addEventListener('change', (event) => setupFileReader(event.target.files[0], 'md', bottomMdFileStatus, mdFileStatus));
             
+            // Page Guide Event Listeners
+            if(guideNextButton) guideNextButton.addEventListener('click', () => {
+                if (currentDemoSlideIndex < demoSlides.length - 1) {
+                    currentDemoSlideIndex++;
+                    renderCurrentDemoSlide();
+                }
+            });
+            if(guidePrevButton) guidePrevButton.addEventListener('click', () => {
+                if (currentDemoSlideIndex > 0) {
+                    currentDemoSlideIndex--;
+                    renderCurrentDemoSlide();
+                }
+            });
+            if(guideSkipButton) guideSkipButton.addEventListener('click', dismissPageGuide);
+            if(guideDoneButton) guideDoneButton.addEventListener('click', dismissPageGuide);
+
             dismissHeatTransferIntroButton.addEventListener('click', () => {
                 heatTransferIntroDismissed = true;
                 manageDetailsTabContent();

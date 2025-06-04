@@ -10,9 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlVDBrTimingYktIWVOvsbMBOUE3Pj5N6G6r4CE7oPSqrCSYtaLJpgZLQZR" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- marked-katex-extension -->
     <script defer src="https://cdn.jsdelivr.net/npm/marked-katex-extension@5.1.4/lib/index.umd.js"></script>
@@ -32,20 +32,22 @@
         .file-upload-section { text-align: center; padding: 1.5rem; background-color: #f8fafc; border-radius: 0.5rem; margin-bottom: 1rem; border: 2px dashed #cbd5e1; }
         .file-input { display: block; margin: 0.5rem auto; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; max-width: 300px; }
         .charts-disabled-overlay { position: absolute; top:0; left:0; right:0; bottom:0; background-color: rgba(241, 245, 249, 0.8); display:flex; align-items:center; justify-content:center; text-align:center; z-index:10; border-radius: 0.5rem;}
-        #detailsContent { padding: 1rem; background-color: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); }
-        #detailsContent h1, #detailsContent h2, #detailsContent h3 { font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #1e293b; }
-        #detailsContent h1 { font-size: 1.875rem; } 
-        #detailsContent h2 { font-size: 1.5rem; }   
-        #detailsContent h3 { font-size: 1.25rem; }  
-        #detailsContent p { margin-bottom: 1em; line-height: 1.6; color: #475569; }
-        #detailsContent ul, #detailsContent ol { margin-left: 1.5em; margin-bottom: 1em; color: #475569; list-style-position: inside; } 
-        #detailsContent li { margin-bottom: 0.25em; }
-        #detailsContent a { color: #0284c7; text-decoration: underline; }
-        #detailsContent strong { font-weight: 600; }
-        #detailsContent em { font-style: italic; }
-        #detailsContent code { background-color: #f1f5f9; padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; }
-        #detailsContent pre { background-color: #f1f5f9; padding: 1em; border-radius: 0.5rem; overflow-x: auto; }
-        #detailsContent pre code { background-color: transparent; padding: 0; margin: 0; font-size: inherit; border-radius: 0; }
+        
+        /* Styles for the Markdown content area */
+        #detailsMarkdownHost { padding: 1rem; background-color: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); }
+        #detailsMarkdownHost h1, #detailsMarkdownHost h2, #detailsMarkdownHost h3 { font-weight: bold; margin-top: 1em; margin-bottom: 0.5em; color: #1e293b; }
+        #detailsMarkdownHost h1 { font-size: 1.875rem; } 
+        #detailsMarkdownHost h2 { font-size: 1.5rem; }   
+        #detailsMarkdownHost h3 { font-size: 1.25rem; }  
+        #detailsMarkdownHost p { margin-bottom: 1em; line-height: 1.6; color: #475569; }
+        #detailsMarkdownHost ul, #detailsMarkdownHost ol { margin-left: 1.5em; margin-bottom: 1em; color: #475569; list-style-position: inside; } 
+        #detailsMarkdownHost li { margin-bottom: 0.25em; }
+        #detailsMarkdownHost a { color: #0284c7; text-decoration: underline; }
+        #detailsMarkdownHost strong { font-weight: 600; }
+        #detailsMarkdownHost em { font-style: italic; }
+        #detailsMarkdownHost code { background-color: #f1f5f9; padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; }
+        #detailsMarkdownHost pre { background-color: #f1f5f9; padding: 1em; border-radius: 0.5rem; overflow-x: auto; }
+        #detailsMarkdownHost pre code { background-color: transparent; padding: 0; margin: 0; font-size: inherit; border-radius: 0; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -56,7 +58,7 @@
             <p class="text-md md:text-lg text-slate-600 mt-2">Interactive Analysis of the Noctua NH-L9a-AM4 on AMD Ryzen 5 PRO 4650G</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div id="topUploadContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div id="dataUploadSection" class="file-upload-section">
                 <h2 class="text-xl font-semibold mb-2 text-slate-700">1. Load Experiment Data (CSV)</h2>
                 <p class="text-slate-500 mb-3 text-sm">Select a CSV file or use the default loaded data.</p>
@@ -114,8 +116,10 @@
                         <h3 class="text-xl font-semibold text-center mb-4">Conclusion Summary</h3>
                         <ul class="list-disc list-inside space-y-2 text-slate-700">
                             <li><span class="font-semibold">Power Impact:</span> CPU temperature directly correlates with power consumption, a relationship clearly modulated by fan speed.</li>
-                            <li><span class="font-semibold">Power Target Tracking:</span> The CPU generally met its set power targets, with minor deviations observed under various thermal loads.</li>
-                            <li><span class="font-semibold">Quantitative Basis:</span> These findings provide a solid, data-driven basis for creating effective thermal management strategies and optimized fan curves.</li>
+                            <li><span class="font-semibold">Power Target Tracking:</span> The CPU generally met its set power targets, with only minor deviations observed under various thermal loads. It is worth mentioning that the maximum power consumption is around 50W; therefore, Power Target no longer controls the package power after that. (See Performance Explorer.)</li>
+                            <li><span class="font-semibold">Primarily Convection-Based Cooling:</span> The fitted physics model (R<sub>th</sub> = R<sub>fixed</sub> + C / RPM<sup>n</sup>) demonstrates that the cooler's performance is overwhelmingly governed by convection. The significant C / RPM<sup>n</sup> term, which directly relates to airflow (RPM), and a near-zero fitted R<sub>fixed</sub> value, indicate that heat dissipation is primarily achieved by air moving over the heatsink fins. (See Experiment Details and Play around in Thermal Model!)</li>
+                            <li><span class="font-semibold">Verification:</span> The above result should be replicable, if you also use Linux and have an Ryzen CPU, feel free to verify yourself with your own data.</li>
+
                         </ul>
                     </div>
                 </div>
@@ -148,7 +152,7 @@
                  <div class="space-y-12">
                     <div class="relative">
                         <h2 class="text-2xl font-bold text-center mb-2">Thermal Resistance Model</h2>
-                        <p class="text-center text-slate-600 mb-4 max-w-3xl mx-auto">Thermal resistance ($R_{th}$) measures cooling efficiency. A physics-based model was fitted to the data, showing how $R_{th}$ decreases as fan RPM increases.</p>
+                        <p class="text-center text-slate-600 mb-4 max-w-3xl mx-auto">Thermal resistance (R<sub>th</sub>) measures cooling efficiency. A physics-based model was fitted to the data, showing how R<sub>th</sub> decreases as fan RPM increases.</p>
                         <div class="chart-container"><canvas id="rthVsRpmChart"></canvas></div>
                         <div id="rthVsRpmOverlay" class="charts-disabled-overlay"><p>Load CSV data to view chart.</p></div>
                     </div>
@@ -168,7 +172,7 @@
                     </div>
                     <div class="relative">
                         <h2 class="text-2xl font-bold text-center mb-2">Finding the "Sweet Spot"</h2>
-                        <p class="text-center text-slate-600 mb-4 max-w-3xl mx-auto">The "sweet spot" occurs where the benefit of increasing fan speed diminishes. This chart shows the rate of change of $R_{th}$. The curve flattens at higher RPMs, indicating less cooling gain per RPM increase.</p>
+                        <p class="text-center text-slate-600 mb-4 max-w-3xl mx-auto">The "sweet spot" occurs where the benefit of increasing fan speed diminishes. This chart shows the rate of change of R<sub>th</sub>. The curve flattens at higher RPMs, indicating less cooling gain per RPM increase.</p>
                         <div class="chart-container"><canvas id="derivativeChart"></canvas></div>
                         <div id="derivativeOverlay" class="charts-disabled-overlay"><p>Load CSV data to view chart.</p></div>
                     </div>
@@ -176,14 +180,67 @@
             </div>
 
             <div id="details" class="content-section">
-                <div class="max-w-3xl mx-auto">
-                    <div id="detailsContent">
-                        <p class="text-center text-slate-500">Please upload a Markdown (.md) file to populate this section, or wait for default load.</p>
+                <div class="w-full mx-auto sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl">
+                    <!-- Heat Transfer Modal -->
+                    <div id="heatTransferIntroModal" class="bg-sky-50 p-6 rounded-lg shadow-lg mb-6 border border-sky-200" style="display: none;">
+                        <h3 class="text-xl font-semibold text-center mb-4 text-sky-700">Understanding Heat Transfer in CPU Cooling</h3>
+                        <p class="text-slate-600 mb-4 text-sm">
+                            The cooling of a CPU involves a sequence of heat transfer processes: conduction, convection, and radiation.
+                        </p>
+                        <div class="space-y-3 text-slate-700 text-left">
+                            <div>
+                                <h4 class="font-semibold text-slate-700">1. Conduction</h4>
+                                <p class="text-sm">Heat conduction is the transfer of thermal energy through a material due to a temperature gradient. In the CPU cooling assembly, this occurs from the silicon die, through Thermal Interface Materials (TIMs) and the Integrated Heat Spreader (IHS), into the cooler's base, along heatpipes to the fin stack, and through the aluminum fins.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-700">2. Convection</h4>
+                                <p class="text-sm">Convection is heat transfer between a solid surface and a moving fluid (air). Forced convection, driven by the CPU fan, is the dominant mode for rejecting heat from the heatsink fins to the surrounding air.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-700">3. Radiation</h4>
+                                <p class="text-sm">Radiative heat transfer occurs via electromagnetic waves. Heat radiates from the heatsink surfaces to cooler components and the case interior. It usually plays a secondary role in forced convection air cooling but can be a factor.</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 mt-4 text-sm">
+                            These mechanisms form a thermal chain. A bottleneck in any step degrades overall cooling.
+                        </p>
+                        <div class="text-center mt-6">
+                            <button id="dismissHeatTransferIntroButton" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                                I know, I know... Show me the details!
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Main Markdown Content Area -->
+                    <div id="detailsMarkdownHost" style="display: none;">
+                        <!-- Parsed markdown will be injected here -->
+                    </div>
+
+                    <!-- Fallback Message for Markdown -->
+                    <p id="detailsFallbackMessage" class="text-center text-slate-500 p-6 bg-white rounded-lg shadow-sm">
+                        Please upload a Markdown (.md) file to populate this section, or wait for default load.
+                    </p>
                 </div>
             </div>
         </main>
     </div>
+
+    <div id="bottomFileUploadArea" class="container mx-auto p-4 md:p-8 mt-8 border-t border-slate-200" style="display: none;">
+        <h3 class="text-lg font-semibold text-slate-700 mb-3 text-center">Change Loaded Files</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <div class="file-upload-section !p-4 !mb-0 !border-slate-300">
+                <label for="bottomCsvFileInput" class="block text-md font-medium text-slate-600 mb-1">Reload CSV Data:</label>
+                <input type="file" id="bottomCsvFileInput" class="file-input !text-sm !max-w-[250px]" accept=".csv">
+                <p id="bottomCsvFileStatus" class="text-xs text-slate-500 mt-1">Default CSV loaded.</p>
+            </div>
+            <div class="file-upload-section !p-4 !mb-0 !border-slate-300">
+                <label for="bottomMdFileInput" class="block text-md font-medium text-slate-600 mb-1">Reload Details (MD):</label>
+                <input type="file" id="bottomMdFileInput" class="file-input !text-sm !max-w-[250px]" accept=".md,.txt">
+                <p id="bottomMdFileStatus" class="text-xs text-slate-500 mt-1">Default Markdown loaded.</p>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         let processedData = [];
@@ -192,11 +249,17 @@
         let modelParams = { C: 12.0157, n: 0.3467, R_fixed: 0.0 }; 
         let sweetSpotRPM = 1967; 
         let _isMarkedInitialized = false;
+        let heatTransferIntroDismissed = false;
+        let mdDataAvailable = false;
+        let defaultCsvLoadedSuccessfully = false;
+        let defaultMdLoadedSuccessfully = false;
 
-        // UI Elements (cached for performance)
-        let csvFileInput, csvFileStatus, mdFileInput, mdFileStatus, detailsContentDiv;
+        // UI Elements
+        let csvFileInput, csvFileStatus, mdFileInput, mdFileStatus, detailsMarkdownHostDiv, detailsFallbackMessageP;
         let mainNav, mainContent, navTabs, contentSections, rpmSlider, rpmSliderMinLabel, rpmSliderMaxLabel;
         let chartOverlays = {};
+        let heatTransferIntroModal, dismissHeatTransferIntroButton;
+        let topUploadContainer, bottomFileUploadArea, bottomCsvFileInput, bottomMdFileInput, bottomCsvFileStatus, bottomMdFileStatus;
 
 
         const rthModel = (rpm) => modelParams.R_fixed + modelParams.C / Math.pow(rpm, modelParams.n);
@@ -263,7 +326,7 @@
         };
 
         const initCalculator = () => {
-            const slider = document.getElementById('rpmSlider'); // rpmSlider is already global
+            const slider = document.getElementById('rpmSlider');
             const rpmValueDisplay = document.getElementById('rpmValue');
             const rthValueDisplay = document.getElementById('rthValue');
 
@@ -282,8 +345,20 @@
             updateCalculatorDisplay(); 
         };
 
-        function handleSuccessfulCsvLoad(fileName, dataLength) {
-            csvFileStatus.textContent = `${fileName} loaded successfully. ${dataLength} records found.`;
+        function checkAndManageTopUploadVisibility() {
+            if (defaultCsvLoadedSuccessfully && defaultMdLoadedSuccessfully) {
+                if (topUploadContainer) topUploadContainer.style.display = 'none';
+                if (bottomFileUploadArea) bottomFileUploadArea.style.display = 'block'; // Use block for this layout
+            } else {
+                if (topUploadContainer) topUploadContainer.style.display = 'grid'; // Default display for grid
+                if (bottomFileUploadArea) bottomFileUploadArea.style.display = 'none';
+            }
+        }
+
+        function handleSuccessfulCsvLoad(fileName, dataLength, primaryStatusEl, secondaryStatusEl) {
+            primaryStatusEl.textContent = `${fileName} loaded successfully. ${dataLength} records found.`;
+            if(secondaryStatusEl) secondaryStatusEl.textContent = `${fileName} loaded. (${dataLength} records)`;
+            
             mainNav.classList.remove('hidden');
             mainContent.classList.remove('hidden');
             
@@ -309,30 +384,70 @@
             }
         }
 
-        function handleResetCsvLoadError(fileName, errorMessage) {
+        function handleResetCsvLoadError(fileName, errorMessage, primaryStatusEl, secondaryStatusEl) {
             console.error("Error with CSV:", errorMessage);
-            csvFileStatus.textContent = `Error with ${fileName}. ${errorMessage}`;
+            primaryStatusEl.textContent = `Error with ${fileName}. ${errorMessage}`;
+            if(secondaryStatusEl) secondaryStatusEl.textContent = `Error with ${fileName}.`;
+
             mainNav.classList.add('hidden');
             mainContent.classList.add('hidden');
             rpmSlider.disabled = true;
             showChartOverlays(true);
             destroyAllCharts();
             processedData = [];
-            updateOverviewStats(); // Resets stats to N/A or defaults
-            initCalculator(); // Resets calculator
-        }
-
-        function handleSuccessfulMdLoad(fileName, markdownText) {
-            if (_isMarkedInitialized) {
-                const htmlContent = marked.parse(markdownText);
-                detailsContentDiv.innerHTML = htmlContent;
-                mdFileStatus.textContent = `${fileName} loaded and rendered.`;
-            } else {
-                detailsContentDiv.innerHTML = "<p class='text-red-500 font-semibold'>Markdown renderer (Marked.js with KaTeX) could not be initialized. Cannot display content.</p>";
-                mdFileStatus.textContent = `Error: Markdown renderer not initialized for ${fileName}.`;
-            }
+            updateOverviewStats(); 
+            initCalculator(); 
         }
         
+        function manageDetailsTabContent() {
+            const activeTabButton = document.querySelector('.nav-button.active');
+            if (activeTabButton && activeTabButton.dataset.tab !== 'details') {
+                heatTransferIntroModal.style.display = 'none'; // Hide if not on details tab
+                return;
+            }
+
+            if (mdDataAvailable) {
+                detailsFallbackMessageP.style.display = 'none';
+                if (!heatTransferIntroDismissed) {
+                    heatTransferIntroModal.style.display = 'block';
+                    detailsMarkdownHostDiv.style.display = 'none';
+                } else {
+                    heatTransferIntroModal.style.display = 'none';
+                    detailsMarkdownHostDiv.style.display = 'block';
+                }
+            } else { // No MD data yet, or error
+                heatTransferIntroModal.style.display = 'none';
+                detailsMarkdownHostDiv.style.display = 'none';
+                detailsFallbackMessageP.style.display = 'block'; 
+                // Fallback message content might be updated by error handler
+            }
+        }
+
+
+        function handleSuccessfulMdLoad(fileName, markdownText, primaryStatusEl, secondaryStatusEl) {
+            mdDataAvailable = true;
+            if (_isMarkedInitialized) {
+                const htmlContent = marked.parse(markdownText);
+                detailsMarkdownHostDiv.innerHTML = htmlContent;
+                primaryStatusEl.textContent = `${fileName} loaded and rendered.`;
+                if(secondaryStatusEl) secondaryStatusEl.textContent = `${fileName} loaded.`;
+            } else {
+                detailsMarkdownHostDiv.innerHTML = "<p class='text-red-500 font-semibold'>Markdown renderer could not be initialized.</p>";
+                primaryStatusEl.textContent = `Error: Markdown renderer not initialized for ${fileName}.`;
+                 if(secondaryStatusEl) secondaryStatusEl.textContent = `Error: MD renderer issue.`;
+            }
+            manageDetailsTabContent();
+        }
+        
+        function handleMdLoadError(fileName, errorMessage, primaryStatusEl, secondaryStatusEl) {
+            mdDataAvailable = false;
+            console.error("Error with Markdown:", errorMessage);
+            primaryStatusEl.textContent = `Error with ${fileName}. ${errorMessage}`;
+            if(secondaryStatusEl) secondaryStatusEl.textContent = `Error with ${fileName}.`;
+            detailsMarkdownHostDiv.innerHTML = `<p class="text-red-500 font-semibold">Error loading details: ${errorMessage}</p>`;
+            manageDetailsTabContent(); // This will show fallback message area (or error in detailsMarkdownHostDiv if preferred)
+        }
+
         async function loadDefaultCsv() {
             try {
                 const response = await fetch('cpu_cooling_data_processed.csv');
@@ -340,13 +455,15 @@
                     throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
                 const text = await response.text();
-                parseCSVData(text); // This populates global `processedData` and can throw error
-                handleSuccessfulCsvLoad('cpu_cooling_data_processed.csv (default)', processedData.length);
+                parseCSVData(text);
+                defaultCsvLoadedSuccessfully = true;
+                handleSuccessfulCsvLoad('Default CSV', processedData.length, csvFileStatus, bottomCsvFileStatus);
             } catch (error) {
-                csvFileStatus.textContent = `Failed to load default CSV: ${error.message}. Please upload a file.`;
-                console.error("Error loading default CSV:", error);
-                // UI remains in "no data loaded" state (nav/main hidden, overlays shown)
+                defaultCsvLoadedSuccessfully = false;
+                handleResetCsvLoadError('Default CSV', error.message, csvFileStatus, bottomCsvFileStatus);
+                csvFileStatus.textContent += " Please upload a file."; // More specific
             }
+            checkAndManageTopUploadVisibility();
         }
 
         async function loadDefaultMd() {
@@ -356,25 +473,35 @@
                     throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
                 const markdownText = await response.text();
-                handleSuccessfulMdLoad('exp.md (default)', markdownText);
+                defaultMdLoadedSuccessfully = true;
+                handleSuccessfulMdLoad('Default Markdown', markdownText, mdFileStatus, bottomMdFileStatus);
             } catch (error) {
-                mdFileStatus.textContent = `Failed to load default MD: ${error.message}. Please upload a file.`;
-                console.error("Error loading default MD:", error);
-                if (_isMarkedInitialized) {
-                     detailsContentDiv.innerHTML = `<p class="text-red-500">Error loading default Markdown content: ${error.message}</p>`;
-                } else {
-                     detailsContentDiv.innerHTML = `<p class="text-red-500">Error loading default Markdown content AND renderer not available.</p>`;
-                }
+                defaultMdLoadedSuccessfully = false;
+                handleMdLoadError('Default Markdown', error.message, mdFileStatus, bottomMdFileStatus);
+                mdFileStatus.textContent += " Please upload a file.";
+                 detailsFallbackMessageP.innerHTML = `<p class="text-red-500">Error loading default Markdown: ${error.message}</p>`;
             }
+            checkAndManageTopUploadVisibility();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             // Cache UI elements
+            topUploadContainer = document.getElementById('topUploadContainer');
+            bottomFileUploadArea = document.getElementById('bottomFileUploadArea');
             csvFileInput = document.getElementById('csvFileInput');
             csvFileStatus = document.getElementById('csvFileStatus');
             mdFileInput = document.getElementById('mdFileInput');
             mdFileStatus = document.getElementById('mdFileStatus');
-            detailsContentDiv = document.getElementById('detailsContent');
+            bottomCsvFileInput = document.getElementById('bottomCsvFileInput');
+            bottomMdFileInput = document.getElementById('bottomMdFileInput');
+            bottomCsvFileStatus = document.getElementById('bottomCsvFileStatus');
+            bottomMdFileStatus = document.getElementById('bottomMdFileStatus');
+
+            detailsMarkdownHostDiv = document.getElementById('detailsMarkdownHost');
+            detailsFallbackMessageP = document.getElementById('detailsFallbackMessage');
+            heatTransferIntroModal = document.getElementById('heatTransferIntroModal');
+            dismissHeatTransferIntroButton = document.getElementById('dismissHeatTransferIntroButton');
+            
             mainNav = document.getElementById('mainNav');
             mainContent = document.getElementById('mainContent');
             navTabs = document.querySelectorAll('.nav-button');
@@ -390,76 +517,71 @@
                 derivative: document.getElementById('derivativeOverlay')
             };
 
-            // Initialize Marked.js with KaTeX extension
             if (typeof marked !== 'undefined' && typeof window.markedKatex === 'function' && typeof katex !== 'undefined') {
                 try {
                     marked.use(window.markedKatex({ throwOnError: false, errorColor: '#FF0000' }));
                     _isMarkedInitialized = true;
-                    console.log("Marked.js with KaTeX extension initialized successfully.");
-                } catch (e) {
-                    console.error("Error initializing marked-katex-extension:", e);
-                     _isMarkedInitialized = false;
-                }
-            } else {
-                console.warn("Marked.js, KaTeX, or marked-katex-extension not loaded. Markdown rendering with LaTeX will not be available.");
-                 _isMarkedInitialized = false;
-            }
+                } catch (e) { console.error("Error initializing marked-katex-extension:", e); }
+            } else { console.warn("Marked.js, KaTeX, or marked-katex-extension not loaded."); }
 
-            // Initial UI State
             mainNav.classList.add('hidden');
             mainContent.classList.add('hidden');
             rpmSlider.disabled = true;
             showChartOverlays(true);
-            initCalculator(); // Initialize calculator in its default (N/A) state
+            initCalculator(); 
+            manageDetailsTabContent(); // Initial state for details tab
 
-            // Attempt to load default files
             loadDefaultCsv();
             loadDefaultMd();
             
-            csvFileInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    csvFileStatus.textContent = `Reading ${file.name}...`;
+            function setupFileReader(file, type, primaryStatusEl, secondaryStatusEl) {
+                 if (file) {
+                    primaryStatusEl.textContent = `Reading ${file.name}...`;
+                    if(secondaryStatusEl) secondaryStatusEl.textContent = `Reading ${file.name}...`;
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         try {
                             const text = e.target.result;
-                            parseCSVData(text);
-                            handleSuccessfulCsvLoad(file.name, processedData.length);
+                            if (type === 'csv') {
+                                parseCSVData(text);
+                                defaultCsvLoadedSuccessfully = false; // A user file overrides default status for visibility logic
+                                checkAndManageTopUploadVisibility();
+                                handleSuccessfulCsvLoad(file.name, processedData.length, primaryStatusEl, secondaryStatusEl);
+                            } else if (type === 'md') {
+                                defaultMdLoadedSuccessfully = false; // A user file overrides default status for visibility logic
+                                checkAndManageTopUploadVisibility();
+                                handleSuccessfulMdLoad(file.name, text, primaryStatusEl, secondaryStatusEl);
+                            }
                         } catch (error) {
-                            handleResetCsvLoadError(file.name, error.message);
+                            if (type === 'csv') {
+                                handleResetCsvLoadError(file.name, error.message, primaryStatusEl, secondaryStatusEl);
+                            } else if (type === 'md') {
+                                handleMdLoadError(file.name, error.message, primaryStatusEl, secondaryStatusEl);
+                            }
                         }
                     };
                     reader.onerror = () => {
-                         handleResetCsvLoadError(file.name, 'File could not be read.');
+                        const errorMsg = 'File could not be read.';
+                        if (type === 'csv') {
+                             handleResetCsvLoadError(file.name, errorMsg, primaryStatusEl, secondaryStatusEl);
+                        } else if (type === 'md') {
+                             handleMdLoadError(file.name, errorMsg, primaryStatusEl, secondaryStatusEl);
+                        }
                     };
                     reader.readAsText(file);
                 }
+            }
+
+            csvFileInput.addEventListener('change', (event) => setupFileReader(event.target.files[0], 'csv', csvFileStatus, bottomCsvFileStatus));
+            mdFileInput.addEventListener('change', (event) => setupFileReader(event.target.files[0], 'md', mdFileStatus, bottomMdFileStatus));
+            bottomCsvFileInput.addEventListener('change', (event) => setupFileReader(event.target.files[0], 'csv', bottomCsvFileStatus, csvFileStatus));
+            bottomMdFileInput.addEventListener('change', (event) => setupFileReader(event.target.files[0], 'md', bottomMdFileStatus, mdFileStatus));
+            
+            dismissHeatTransferIntroButton.addEventListener('click', () => {
+                heatTransferIntroDismissed = true;
+                manageDetailsTabContent();
             });
 
-            mdFileInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    mdFileStatus.textContent = `Reading ${file.name}...`;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const markdownText = e.target.result;
-                            handleSuccessfulMdLoad(file.name, markdownText);
-                        } catch (error) { // This catch is for unexpected errors during handling
-                            console.error("Error processing Markdown file:", error);
-                            mdFileStatus.textContent = `Error processing ${file.name}.`;
-                            detailsContentDiv.innerHTML = `<p class="text-red-500">Error loading details: ${error.message}</p>`;
-                        }
-                    };
-                    reader.onerror = () => {
-                        mdFileStatus.textContent = `Error reading ${file.name}.`;
-                        detailsContentDiv.innerHTML = `<p class="text-red-500">Error reading Markdown file.</p>`;
-                    };
-                    reader.readAsText(file);
-                }
-            });
-            
             const destroyChart = (chartKey) => {
                 if (activeCharts[chartKey] && typeof activeCharts[chartKey].destroy === 'function') {
                     activeCharts[chartKey].destroy();
@@ -472,57 +594,14 @@
             };
             
             const commonChartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 400 
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                         labels: { font: { size: 12 } }
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(0,0,0,0.7)',
-                        titleFont: { weight: 'bold' },
-                        bodyFont: { size: 12 },
-                        padding: 10,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null && typeof context.parsed.y !== 'undefined') {
-                                    label += `${context.parsed.y.toFixed(2)}`;
-                                } else if (context.parsed.x !== null && typeof context.parsed.x !== 'undefined' && !label.includes('°C/W')) { // Avoid for Rth label if y is primary
-                                     label += `${context.parsed.x.toFixed(2)}`;   
-                                }
-                                return label;
-                            }
-                        }
+                responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+                plugins: { legend: { position: 'top', labels: { font: { size: 12 } } },
+                    tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.7)', titleFont: { weight: 'bold' }, bodyFont: { size: 12 }, padding: 10,
+                        callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null && typeof context.parsed.y !== 'undefined') { label += `${context.parsed.y.toFixed(2)}`; } else if (context.parsed.x !== null && typeof context.parsed.x !== 'undefined' && !label.includes('°C/W')) { label += `${context.parsed.x.toFixed(2)}`; } return label; } }
                     },
                 },
-                scales: {
-                    x: {
-                        type: 'linear', 
-                        title: { display: true, text: 'X-Axis', font: { size: 14, weight: '500' }, color: '#334155' },
-                        grid: { color: '#e2e8f0' },
-                        ticks: { 
-                            font: { size: 11 }, color: '#475569',
-                            maxRotation: 0,
-                            autoSkip: true,
-                            maxTicksLimit: 10 
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        title: { display: true, text: 'Y-Axis', font: { size: 14, weight: '500' }, color: '#334155' },
-                        grid: { color: '#e2e8f0' },
-                        ticks: { font: { size: 11 }, color: '#475569' }
-                    }
+                scales: { x: { type: 'linear', title: { display: true, text: 'X-Axis', font: { size: 14, weight: '500' }, color: '#334155' }, grid: { color: '#e2e8f0' }, ticks: { font: { size: 11 }, color: '#475569', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
+                    y: { type: 'linear', title: { display: true, text: 'Y-Axis', font: { size: 14, weight: '500' }, color: '#334155' }, grid: { color: '#e2e8f0' }, ticks: { font: { size: 11 }, color: '#475569' } }
                 }
             };
             
@@ -530,32 +609,7 @@
                 if (!processedData || processedData.length === 0) return;
                 destroyChart('tempVsPower');
                 const ctx = document.getElementById('tempVsPowerChart').getContext('2d');
-                const data = {
-                    datasets: [{
-                        label: 'Experimental Data',
-                        data: processedData.map(d => ({ x: d.CPU_Power_W_Actual, y: d.CPU_Temp_C, rpm: d.CPU_Fan_RPM })),
-                        backgroundColor: processedData.map(d => `hsl(${240 - (d.CPU_Fan_RPM / 2500) * 180}, 70%, 55%)`),
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }]
-                };
-                activeCharts.tempVsPower = new Chart(ctx, {
-                    type: 'scatter',
-                    data: data,
-                    options: { ...commonChartOptions,
-                        scales: {
-                           x: { ...commonChartOptions.scales.x, title: { display: true, text: 'Actual CPU Power (W)' } },
-                           y: { ...commonChartOptions.scales.y, title: { display: true, text: 'CPU Temperature (°C)' } }
-                        },
-                        plugins: { ...commonChartOptions.plugins,
-                            tooltip: { ...commonChartOptions.plugins.tooltip,
-                                callbacks: {
-                                    label: (c) => `Temp: ${c.parsed.y.toFixed(1)}°C, Power: ${c.parsed.x.toFixed(1)}W, RPM: ${c.raw.rpm}`
-                                }
-                            }
-                        }
-                    }
-                });
+                activeCharts.tempVsPower = new Chart(ctx, { type: 'scatter', data: { datasets: [{ label: 'Experimental Data', data: processedData.map(d => ({ x: d.CPU_Power_W_Actual, y: d.CPU_Temp_C, rpm: d.CPU_Fan_RPM })), backgroundColor: processedData.map(d => `hsl(${240 - (d.CPU_Fan_RPM / 2500) * 180}, 70%, 55%)`), pointRadius: 5, pointHoverRadius: 7 }] }, options: { ...commonChartOptions, scales: { x: { ...commonChartOptions.scales.x, title: { display: true, text: 'Actual CPU Power (W)' } }, y: { ...commonChartOptions.scales.y, title: { display: true, text: 'CPU Temperature (°C)' } } }, plugins: { ...commonChartOptions.plugins, tooltip: { ...commonChartOptions.plugins.tooltip, callbacks: { label: (c) => `Temp: ${c.parsed.y.toFixed(1)}°C, Power: ${c.parsed.x.toFixed(1)}W, RPM: ${c.raw.rpm}` } } } } });
             };
 
             const createTempVsRpmChart = () => {
@@ -564,32 +618,7 @@
                 const ctx = document.getElementById('tempVsRpmChart').getContext('2d');
                 const fanRpms = processedData.map(d => d.CPU_Fan_RPM).filter(r => !isNaN(r) && r > 0);
                 const minFanRpm = fanRpms.length > 0 ? Math.min(...fanRpms) : 0;
-                 const data = {
-                    datasets: [{
-                        label: 'Experimental Data',
-                        data: processedData.map(d => ({ x: d.CPU_Fan_RPM, y: d.CPU_Temp_C, power: d.CPU_Power_W_Actual })),
-                        backgroundColor: processedData.map(d => `hsl(${(d.CPU_Power_W_Actual / 52) * 50 + 20}, 80%, 60%)`), // Max power ~52W for this dataset
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }]
-                };
-                activeCharts.tempVsRpm = new Chart(ctx, {
-                    type: 'scatter',
-                    data: data,
-                    options: { ...commonChartOptions,
-                        scales: {
-                           x: { ...commonChartOptions.scales.x, title: { display: true, text: 'CPU Fan RPM' }, min: Math.max(0, minFanRpm - 50) },
-                           y: { ...commonChartOptions.scales.y, title: { display: true, text: 'CPU Temperature (°C)' } }
-                        },
-                        plugins: { ...commonChartOptions.plugins,
-                            tooltip: { ...commonChartOptions.plugins.tooltip,
-                                callbacks: {
-                                    label: (c) => `Temp: ${c.parsed.y.toFixed(1)}°C, RPM: ${c.parsed.x.toFixed(0)}, Power: ${c.raw.power.toFixed(1)}W`
-                                }
-                            }
-                        }
-                    }
-                });
+                activeCharts.tempVsRpm = new Chart(ctx, { type: 'scatter', data: { datasets: [{ label: 'Experimental Data', data: processedData.map(d => ({ x: d.CPU_Fan_RPM, y: d.CPU_Temp_C, power: d.CPU_Power_W_Actual })), backgroundColor: processedData.map(d => `hsl(${(d.CPU_Power_W_Actual / 52) * 50 + 20}, 80%, 60%)`), pointRadius: 5, pointHoverRadius: 7 }] }, options: { ...commonChartOptions, scales: { x: { ...commonChartOptions.scales.x, title: { display: true, text: 'CPU Fan RPM' }, min: Math.max(0, minFanRpm - 50) }, y: { ...commonChartOptions.scales.y, title: { display: true, text: 'CPU Temperature (°C)' } } }, plugins: { ...commonChartOptions.plugins, tooltip: { ...commonChartOptions.plugins.tooltip, callbacks: { label: (c) => `Temp: ${c.parsed.y.toFixed(1)}°C, RPM: ${c.parsed.x.toFixed(0)}, Power: ${c.raw.power.toFixed(1)}W` } } } } });
             };
 
             const createPptChart = () => {
@@ -599,181 +628,57 @@
                 const setPPTs = processedData.map(d => d.Set_PPT_W).filter(val => !isNaN(val));
                 const minSetPPT = setPPTs.length > 0 ? Math.min(...setPPTs) : 0;
                 const maxSetPPT = setPPTs.length > 0 ? Math.max(...setPPTs) : 100;
-                const data = {
-                    datasets: [{
-                        label: 'Actual vs. Set Power',
-                        data: processedData.map(d => ({ x: d.Set_PPT_W, y: d.CPU_Power_W_Actual })),
-                        backgroundColor: '#0ea5e9', 
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }, {
-                        type: 'line',
-                        label: 'Ideal (1:1)',
-                        data: [{x:minSetPPT, y:minSetPPT}, {x:maxSetPPT, y:maxSetPPT}],
-                        borderColor: '#334155', 
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        pointRadius: 0,
-                        fill: false
-                    }]
-                };
-                activeCharts.ppt = new Chart(ctx, {
-                    type: 'scatter',
-                    data: data,
-                    options: { ...commonChartOptions,
-                        scales: {
-                           x: { ...commonChartOptions.scales.x, title: { display: true, text: 'Set Power Target (W)' } },
-                           y: { ...commonChartOptions.scales.y, title: { display: true, text: 'Actual CPU Power (W)' } }
-                        },
-                        plugins: { ...commonChartOptions.plugins,
-                             tooltip: { ...commonChartOptions.plugins.tooltip,
-                                callbacks: {
-                                    label: (c) => (c.datasetIndex === 0) ? `Actual: ${c.parsed.y.toFixed(1)}W, Set: ${c.parsed.x.toFixed(0)}W` : null
-                                }
-                            }
-                        }
-                    }
-                });
+                activeCharts.ppt = new Chart(ctx, { type: 'scatter', data: { datasets: [{ label: 'Actual vs. Set Power', data: processedData.map(d => ({ x: d.Set_PPT_W, y: d.CPU_Power_W_Actual })), backgroundColor: '#0ea5e9', pointRadius: 5, pointHoverRadius: 7 }, { type: 'line', label: 'Ideal (1:1)', data: [{x:minSetPPT, y:minSetPPT}, {x:maxSetPPT, y:maxSetPPT}], borderColor: '#334155', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false }] }, options: { ...commonChartOptions, scales: { x: { ...commonChartOptions.scales.x, title: { display: true, text: 'Set Power Target (W)' } }, y: { ...commonChartOptions.scales.y, title: { display: true, text: 'Actual CPU Power (W)' } } }, plugins: { ...commonChartOptions.plugins, tooltip: { ...commonChartOptions.plugins.tooltip, callbacks: { label: (c) => (c.datasetIndex === 0) ? `Actual: ${c.parsed.y.toFixed(1)}W, Set: ${c.parsed.x.toFixed(0)}W` : null } } } } });
             };
             
             const createRthVsRpmChart = () => {
                  if (!processedData || processedData.length === 0) return;
                  destroyChart('rthVsRpm');
                  const ctx = document.getElementById('rthVsRpmChart').getContext('2d');
-                 const modelData = [];
-                 const rpms = processedData.map(d => d.CPU_Fan_RPM).filter(rpm => rpm > 0 && !isNaN(rpm));
-                 const minExpRPM = rpms.length > 0 ? Math.min(...rpms) : 300;
-                 const maxExpRPM = rpms.length > 0 ? Math.max(...rpms) : 2500;
-
-                 for(let rpm = minExpRPM; rpm <= maxExpRPM; rpm += Math.max(10, (maxExpRPM-minExpRPM)/50) ) { 
-                     if (rpm > 0) modelData.push({x: rpm, y: rthModel(rpm)});
-                 }
-                 if (modelData.length === 0 && minExpRPM > 0) { 
-                    for(let rpm = 300; rpm <= 2500; rpm += 50) modelData.push({x: rpm, y: rthModel(rpm)});
-                 }
-
-                 const data = {
-                    datasets: [{
-                        label: 'Experimental Rth',
-                        data: processedData.filter(d => d.Rth !== null && !isNaN(d.Rth)).map(d => ({ x: d.CPU_Fan_RPM, y: d.Rth })),
-                        backgroundColor: '#38bdf8', 
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        type: 'scatter'
-                    },{
-                        label: 'Fitted Model',
-                        data: modelData,
-                        borderColor: '#ef4444', 
-                        borderWidth: 2.5,
-                        pointRadius: 0,
-                        type: 'line',
-                        fill: false,
-                        tension: 0.1
-                    }]
-                };
-                activeCharts.rthVsRpm = new Chart(ctx, {
-                    data: data,
-                    options: { ...commonChartOptions,
-                        scales: {
-                           x: { ...commonChartOptions.scales.x, title: { display: true, text: 'CPU Fan RPM' }, min: minExpRPM > 0 ? Math.max(0, minExpRPM - 50) : 250, ticks: {...commonChartOptions.scales.x.ticks, stepSize: 250} },
-                           y: { ...commonChartOptions.scales.y, title: { display: true, text: 'Thermal Resistance (°C/W)' } }
-                        },
-                         plugins: { ...commonChartOptions.plugins,
-                             tooltip: { ...commonChartOptions.plugins.tooltip,
-                                callbacks: {
-                                    label: (c) => {
-                                        if (c.dataset.label === 'Experimental Rth') return `Exp. Rth: ${c.parsed.y.toFixed(3)} °C/W, RPM: ${c.parsed.x.toFixed(0)}`;
-                                        if (c.dataset.label === 'Fitted Model') return `Model Rth: ${c.parsed.y.toFixed(3)} °C/W, RPM: ${c.parsed.x.toFixed(0)}`;
-                                        return `${c.parsed.y.toFixed(3)} °C/W`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                 const modelData = []; const rpms = processedData.map(d => d.CPU_Fan_RPM).filter(rpm => rpm > 0 && !isNaN(rpm));
+                 const minExpRPM = rpms.length > 0 ? Math.min(...rpms) : 300; const maxExpRPM = rpms.length > 0 ? Math.max(...rpms) : 2500;
+                 for(let rpm = minExpRPM; rpm <= maxExpRPM; rpm += Math.max(10, (maxExpRPM-minExpRPM)/50) ) { if (rpm > 0) modelData.push({x: rpm, y: rthModel(rpm)}); }
+                 if (modelData.length === 0 && minExpRPM > 0) { for(let rpm = 300; rpm <= 2500; rpm += 50) modelData.push({x: rpm, y: rthModel(rpm)}); }
+                 activeCharts.rthVsRpm = new Chart(ctx, { data: { datasets: [{ label: 'Experimental Rth', data: processedData.filter(d => d.Rth !== null && !isNaN(d.Rth)).map(d => ({ x: d.CPU_Fan_RPM, y: d.Rth })), backgroundColor: '#38bdf8', pointRadius: 5, pointHoverRadius: 7, type: 'scatter' },{ label: 'Fitted Model', data: modelData, borderColor: '#ef4444', borderWidth: 2.5, pointRadius: 0, type: 'line', fill: false, tension: 0.1 }] }, options: { ...commonChartOptions, scales: { x: { ...commonChartOptions.scales.x, title: { display: true, text: 'CPU Fan RPM' }, min: minExpRPM > 0 ? Math.max(0, minExpRPM - 50) : 250, ticks: {...commonChartOptions.scales.x.ticks, stepSize: 250} }, y: { ...commonChartOptions.scales.y, title: { display: true, text: 'Thermal Resistance (°C/W)' } } }, plugins: { ...commonChartOptions.plugins, tooltip: { ...commonChartOptions.plugins.tooltip, callbacks: { label: (c) => { if (c.dataset.label === 'Experimental Rth') return `Exp. Rth: ${c.parsed.y.toFixed(3)} °C/W, RPM: ${c.parsed.x.toFixed(0)}`; if (c.dataset.label === 'Fitted Model') return `Model Rth: ${c.parsed.y.toFixed(3)} °C/W, RPM: ${c.parsed.x.toFixed(0)}`; return `${c.parsed.y.toFixed(3)} °C/W`; } } } } } });
             };
 
             const createDerivativeChart = () => {
                 if (!processedData || processedData.length === 0) return;
                 destroyChart('derivative');
                 const ctx = document.getElementById('derivativeChart').getContext('2d');
-                const modelData = [];
-                const rpms = processedData.map(d => d.CPU_Fan_RPM).filter(rpm => rpm > 0 && !isNaN(rpm));
-                const minExpRPM = rpms.length > 0 ? Math.min(...rpms) : 300;
-                const maxExpRPM = rpms.length > 0 ? Math.max(...rpms) : 2500;
-
-                for(let rpm = minExpRPM; rpm <= maxExpRPM; rpm += Math.max(10, (maxExpRPM-minExpRPM)/100)) { 
-                     if (rpm > 0) modelData.push({x: rpm, y: derivativeModel(rpm)});
-                }
-                 if (modelData.length === 0 && minExpRPM > 0) { 
-                    for(let rpm = 300; rpm <= 2500; rpm += 10) modelData.push({x: rpm, y: derivativeModel(rpm)});
-                 }
-                
-                const yValues = modelData.map(p=>p.y).filter(y => isFinite(y));
-                const minYDerivative = yValues.length > 0 ? Math.min(...yValues) : -0.002;
-                const maxYDerivative = yValues.length > 0 ? Math.max(...yValues) : 0; 
-
-                const data = {
-                    datasets: [{
-                        label: 'Rate of Change of Rth (d(Rth)/d(RPM))',
-                        data: modelData,
-                        borderColor: '#10b981', 
-                        borderWidth: 2.5,
-                        pointRadius: 0,
-                        fill: false,
-                        tension: 0.1
-                    },{
-                        label: `Sweet Spot Indicator (~${sweetSpotRPM} RPM)`, 
-                        data: [{x: sweetSpotRPM, y: minYDerivative * 1.1 }, {x:sweetSpotRPM, y: Math.min(0, maxYDerivative * 0.9) }], 
-                        borderColor: '#f97316', 
-                        borderWidth: 2,
-                        borderDash: [5,5],
-                        pointRadius: 0,
-                        fill: false,
-                        type: 'line'
-                    }]
-                };
-                activeCharts.derivative = new Chart(ctx, {
-                    type: 'line',
-                    data: data,
-                    options: { ...commonChartOptions,
-                        scales: {
-                           x: { ...commonChartOptions.scales.x, title: { display: true, text: 'CPU Fan RPM' }, min: minExpRPM > 0 ? Math.max(0, minExpRPM - 50) : 250, ticks: {...commonChartOptions.scales.x.ticks, stepSize: 250, callback: function(value) { return value.toFixed(0); }} },
-                           y: { ...commonChartOptions.scales.y, title: { display: true, text: 'd(Rth)/d(RPM) (°C/W/RPM)' }, ticks: {...commonChartOptions.scales.y.ticks, callback: function(value) { return value.toExponential(2);}} } 
-                        }
-                    }
-                });
+                const modelData = []; const rpms = processedData.map(d => d.CPU_Fan_RPM).filter(rpm => rpm > 0 && !isNaN(rpm));
+                const minExpRPM = rpms.length > 0 ? Math.min(...rpms) : 300; const maxExpRPM = rpms.length > 0 ? Math.max(...rpms) : 2500;
+                for(let rpm = minExpRPM; rpm <= maxExpRPM; rpm += Math.max(10, (maxExpRPM-minExpRPM)/100)) { if (rpm > 0) modelData.push({x: rpm, y: derivativeModel(rpm)}); }
+                if (modelData.length === 0 && minExpRPM > 0) { for(let rpm = 300; rpm <= 2500; rpm += 10) modelData.push({x: rpm, y: derivativeModel(rpm)}); }
+                const yValues = modelData.map(p=>p.y).filter(y => isFinite(y)); const minYDerivative = yValues.length > 0 ? Math.min(...yValues) : -0.002; const maxYDerivative = yValues.length > 0 ? Math.max(...yValues) : 0; 
+                activeCharts.derivative = new Chart(ctx, { type: 'line', data: { datasets: [{ label: 'Rate of Change of Rth (d(Rth)/d(RPM))', data: modelData, borderColor: '#10b981', borderWidth: 2.5, pointRadius: 0, fill: false, tension: 0.1 },{ label: `Sweet Spot Indicator (~${sweetSpotRPM} RPM)`, data: [{x: sweetSpotRPM, y: minYDerivative * 1.1 }, {x:sweetSpotRPM, y: Math.min(0, maxYDerivative * 0.9) }], borderColor: '#f97316', borderWidth: 2, borderDash: [5,5], pointRadius: 0, fill: false, type: 'line' }] }, options: { ...commonChartOptions, scales: { x: { ...commonChartOptions.scales.x, title: { display: true, text: 'CPU Fan RPM' }, min: minExpRPM > 0 ? Math.max(0, minExpRPM - 50) : 250, ticks: {...commonChartOptions.scales.x.ticks, stepSize: 250, callback: function(value) { return value.toFixed(0); }} }, y: { ...commonChartOptions.scales.y, title: { display: true, text: 'd(Rth)/d(RPM) (°C/W/RPM)' }, ticks: {...commonChartOptions.scales.y.ticks, callback: function(value) { return value.toExponential(2);}} } } } });
             };
             
             const createChartsForActiveTab = (tabName) => {
                 if (processedData.length === 0) { 
-                    showChartOverlays(true);
-                    return;
+                    showChartOverlays(true); return;
                 }
                 showChartOverlays(false); 
                 destroyAllCharts(); 
 
-                if (tabName === 'performance') {
-                    createTempVsPowerChart();
-                    createTempVsRpmChart();
-                    createPptChart();
-                } else if (tabName === 'model') {
-                    createRthVsRpmChart();
-                    createDerivativeChart();
-                }
+                if (tabName === 'performance') { createTempVsPowerChart(); createTempVsRpmChart(); createPptChart(); }
+                else if (tabName === 'model') { createRthVsRpmChart(); createDerivativeChart(); }
             };
             
             navTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabName = tab.dataset.tab;
-                    
                     navTabs.forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
-
                     contentSections.forEach(s => s.classList.remove('active'));
                     document.getElementById(tabName).classList.add('active');
                     
-                    createChartsForActiveTab(tabName);
+                    if (tabName === 'details') {
+                        manageDetailsTabContent();
+                    } else {
+                         if(heatTransferIntroModal) heatTransferIntroModal.style.display = 'none'; // Hide intro if navigating away from details
+                        createChartsForActiveTab(tabName);
+                    }
                 });
             });
         });

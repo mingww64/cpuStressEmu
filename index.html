@@ -649,11 +649,71 @@
                 const modelData = []; const rpms = processedData.map(d => d.CPU_Fan_RPM).filter(rpm => rpm > 0 && !isNaN(rpm));
                 const minExpRPM = rpms.length > 0 ? Math.min(...rpms) : 300; const maxExpRPM = rpms.length > 0 ? Math.max(...rpms) : 2500;
                 for(let rpm = minExpRPM; rpm <= maxExpRPM; rpm += Math.max(10, (maxExpRPM-minExpRPM)/100)) { if (rpm > 0) modelData.push({x: rpm, y: derivativeModel(rpm)}); }
-                if (modelData.length === 0 && minExpRPM > 0) { for(let rpm = 300; rpm <= 2500; rpm += 10) modelData.push({x: rpm, y: derivativeModel(rpm)}); }
-                const yValues = modelData.map(p=>p.y).filter(y => isFinite(y)); const minYDerivative = yValues.length > 0 ? Math.min(...yValues) : -0.002; const maxYDerivative = yValues.length > 0 ? Math.max(...yValues) : 0; 
-                activeCharts.derivative = new Chart(ctx, { type: 'line', data: { datasets: [{ label: 'Rate of Change of Rth (d(Rth)/d(RPM))', data: modelData, borderColor: '#10b981', borderWidth: 2.5, pointRadius: 0, fill: false, tension: 0.1 },{ label: `Sweet Spot Indicator (~${sweetSpotRPM} RPM)`, data: [{x: sweetSpotRPM, y: minYDerivative * 1.1 }, {x:sweetSpotRPM, y: Math.min(0, maxYDerivative * 0.9) }], borderColor: '#f97316', borderWidth: 2, borderDash: [5,5], pointRadius: 0, fill: false, type: 'line' }] }, options: { ...commonChartOptions, scales: { x: { ...commonChartOptions.scales.x, title: { display: true, text: 'CPU Fan RPM' }, min: minExpRPM > 0 ? Math.max(0, minExpRPM - 50) : 250, ticks: {...commonChartOptions.scales.x.ticks, stepSize: 250, callback: function(value) { return value.toFixed(0); }} }, y: { ...commonChartOptions.scales.y, title: { display: true, text: 'd(Rth)/d(RPM) (°C/W/RPM)' }, ticks: {...commonChartOptions.scales.y.ticks, callback: function(value) { return value.toExponential(2);}} } } } });
+                if (modelData.length === 0 && minExpRPM > 0) { for(let rpm = 300; rpm <= 2500; rpm += 10) modelData.push({x: rpm, y: derivativeModel(rpm)}); } // Fallback range if no data
+                const yValues = modelData.map(p=>p.y).filter(y => isFinite(y)); const minYDerivative = yValues.length > 0 ? Math.min(...yValues) : -0.002; const maxYDerivative = yValues.length > 0 ? Math.max(...yValues) : 0;
+
+                activeCharts.derivative = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Rate of Change of Rth (d(Rth)/d(RPM))',
+                                data: modelData,
+                                borderColor: '#10b981',
+                                borderWidth: 2.5,
+                                pointRadius: 0,
+                                fill: false,
+                                tension: 0.1
+                            },
+                            {
+                                label: `Sweet Spot Indicator (~${sweetSpotRPM} RPM)`,
+                                data: [{x: sweetSpotRPM, y: minYDerivative * 1.1 }, {x:sweetSpotRPM, y: Math.min(0, maxYDerivative * 0.9) }], // Draw vertical line
+                                borderColor: '#f97316',
+                                borderWidth: 2,
+                                borderDash: [5,5],
+                                pointRadius: 0,
+                                fill: false,
+                                type: 'line'
+                            }
+                        ]
+                    },
+                    options: {
+                        ...commonChartOptions,
+                        scales: {
+                            x: {
+                                ...commonChartOptions.scales.x,
+                                title: { display: true, text: 'CPU Fan RPM' },
+                                min: minExpRPM > 0 ? Math.max(0, minExpRPM - 50) : 250,
+                                ticks: {...commonChartOptions.scales.x.ticks, stepSize: 250, callback: function(value) { return value.toFixed(0); }}
+                            },
+                            y: {
+                                ...commonChartOptions.scales.y,
+                                title: { display: true, text: 'd(Rth)/d(RPM) (°C/W/RPM)' },
+                                ticks: {...commonChartOptions.scales.y.ticks, callback: function(value) { return value.toExponential(2);}}
+                            }
+                        },
+                        plugins: {
+                            ...commonChartOptions.plugins,
+                            tooltip: {
+                                ...commonChartOptions.plugins.tooltip,
+                                callbacks: {
+                                    label: (context) => {
+                                        // Only show tooltip for the derivative line, not the sweet spot indicator line
+                                        if (context.dataset.label === 'Rate of Change of Rth (d(Rth)/d(RPM))') {
+                                            const rpm = context.parsed.x.toFixed(0);
+                                            const derivative = context.parsed.y;
+                                            // Use toExponential for small values, or toFixed with more precision
+                                            const formattedDerivative = derivative.toExponential(2); // e.g., -1.23e-3
+                                            return `RPM: ${rpm}, d(Rth)/d(RPM): ${formattedDerivative} °C/W/RPM`;
+                                        }
+                                        return null; // Hide tooltip for other datasets (like the sweet spot line)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             };
-            
             const createChartsForActiveTab = (tabName) => {
                 if (processedData.length === 0) { 
                     showChartOverlays(true); return;

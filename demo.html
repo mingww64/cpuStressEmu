@@ -133,6 +133,7 @@
             </li>
             <li><strong>Cooler:</strong> Noctua NH-L9a Fan & Heatsink</li>
         </ul>
+        <img src="https://noctua.at/pub/media/catalog/product/cache/0cdbea399f8ed06da39b3854134f6934/n/h/nh_l9a_am4_chromax_black_1.jpg" alt="Noctua NH-L9a-AM4 chromax.black Cooler" class="slide-image">
         <div class="audio-controls">
             <p><em>Slide Audio:</em></p>
             <audio controls src="assets/S3.m4a">Your browser does not support the audio element.</audio>
@@ -369,6 +370,7 @@
     let isSlideModeActive = false;
     let currentSlideAudios = [];
     let currentAudioIndexToPlay = 0;
+    let noAudioAdvanceTimeoutId = null;
 
     function showSlide(index) {
         slides.forEach((slide, i) => {
@@ -410,27 +412,43 @@
     }
 
     function playNextAudioInSequence() {
+        if (!isSlideModeActive) { // If not in slide mode, do nothing further
+            return;
+        }
+
         if (currentAudioIndexToPlay < currentSlideAudios.length) {
             const audioToPlay = currentSlideAudios[currentAudioIndexToPlay];
             audioToPlay.currentTime = 0;
             audioToPlay.play().catch(e => console.error("Error playing audio:", audioToPlay.src, e));
-            // Set up the next one
+            
             audioToPlay.onended = () => {
-                if (isSlideModeActive) { // Only proceed if still in slide mode
+                if (isSlideModeActive) { // Double check, mode might have changed during playback
                     currentAudioIndexToPlay++;
-                    playNextAudioInSequence();
+                    playNextAudioInSequence(); // Play next audio in the sequence for the current slide
                 }
             };
+        } else {
+            // All audios for the current slide have finished
+            if (isSlideModeActive) { // Ensure still in slide mode before advancing
+                autoAdvanceToNextSlide();
+            }
         }
     }
 
     function playAudiosForCurrentSlide() {
-        stopAllAudios(); // Stop audios from previous slide
+        stopAllAudios(); // Stop audios from previous slide & clear any pending timeouts
         currentSlideAudios = getOrderedAudiosForSlide(slides[currentSlideIndex]);
         currentAudioIndexToPlay = 0;
         
-        if (currentSlideAudios.length > 0) {
-            playNextAudioInSequence();
+        if (isSlideModeActive) { // Only proceed if in slide mode
+            if (currentSlideAudios.length > 0) {
+                playNextAudioInSequence();
+            } else {
+                // No audio for this slide, set timeout to advance
+                noAudioAdvanceTimeoutId = setTimeout(() => {
+                    if (isSlideModeActive) { autoAdvanceToNextSlide(); } // Check again before advancing
+                }, 5000);
+            }
         }
     }
 
@@ -440,6 +458,17 @@
             audio.currentTime = 0;
             audio.onended = null; // Remove event listener to prevent auto-advancing
         });
+        // Clear any pending no-audio advance timeout
+        if (noAudioAdvanceTimeoutId) {
+            clearTimeout(noAudioAdvanceTimeoutId);
+            noAudioAdvanceTimeoutId = null;
+        }
+    }
+
+    function autoAdvanceToNextSlide() {
+        if (isSlideModeActive && currentSlideIndex < slides.length - 1) {
+            showSlide(currentSlideIndex + 1);
+        }
     }
 
     slideModeToggle.addEventListener('click', () => {

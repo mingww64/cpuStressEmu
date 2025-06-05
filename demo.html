@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,6 +117,8 @@
         <div class="audio-controls">
             <p><em>Slide Audio:</em></p>
             <audio controls src="assets/S2.m4a">Your browser does not support the audio element.</audio>
+            <audio controls src="assets/S2_1.m4a">Your browser does not support the audio element.</audio>
+
         </div>
     </section>
 
@@ -249,9 +253,9 @@
         </ul>
         <div class="audio-controls">
             <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S8.m4a">Your browser does not support the audio element.</audio>
             <audio controls src="assets/S8_1.m4a">Your browser does not support the audio element.</audio>
             <audio controls src="assets/S8_2.m4a">Your browser does not support the audio element.</audio>
-            <audio controls src="assets/S8.m4a">Your browser does not support the audio element.</audio>
         </div>
     </section>
 
@@ -269,17 +273,21 @@
         <div class="audio-controls">
             <p><em>Slide Audio:</em></p>
             <audio controls src="assets/S9.m4a">Your browser does not support the audio element.</audio>
-                    <li>Define parameter bounds (e.g., $R_{fixed} \ge 0$, $C \ge 0$, $0.1 \le n \le 1.5$).</li>
-                </ul>
-            </li>
+        </div>
+
+        <p>The general data processing and fitting steps included:</p>
+        <ol>
+            <li>Define parameter bounds (e.g., $R_{fixed} \ge 0$, $C \ge 0$, $0.1 \le n \le 1.5$).</li>
             <li><strong>Perform Curve Fitting:</strong> Use non-linear least squares (e.g., <code>scipy.optimize.curve_fit</code>) to find optimal $R_{fixed}$, $C$, $n$.</li>
-            <li><strong>Plot Results:</strong> Visualize experimental data against the fitted model.</li>
-            <li><strong>"Sweet Spot" Analysis (Optional):</strong> Analyze the derivative $dR_{th}/d(RPM)$ to find points of diminishing returns.</li>
+            <li><strong>Plot Results:</strong> Visualize experimental data against the fitted model (as shown above with <code>thermal_resistance_model_fit.png</code>).</li>
+            <li><strong>"Sweet Spot" Analysis (Optional):</strong> Analyze the derivative $dR_{th}/d(RPM)$ to find points of diminishing returns (results discussed in a later slide).</li>
         </ol>
+
+        <p>Supporting visualizations from the data analysis process:</p>
         <img src="assets/Temp_vs_Power.png" alt="Temperature vs Power Chart" class="slide-image-multiple">
         <img src="assets/Temp_vs_RPM.png" alt="Temperature vs RPM Chart" class="slide-image-multiple">
         <img src="assets/Key_Variables_Distribution.png" alt="Key Variables Distribution Chart" class="slide-image-multiple">
-        <p><em>(Detailed pseudo-code available in <code>exp.md</code>)</em></p>
+        <p><em>(Detailed pseudo-code for the fitting process is available in <code>exp.md</code>)</em></p>
         <div class="audio-controls">
             <p><em>Slide Audio:</em></p>
             <audio controls src="assets/S9.m4a">Your browser does not support the audio element.</audio>
@@ -299,8 +307,8 @@
         </ul>
         <div class="audio-controls">
             <p><em>Slide Audio:</em></p>
-            <audio controls src="assets/S11_1.m4a">Your browser does not support the audio element.</audio>
             <audio controls src="assets/S11.m4a">Your browser does not support the audio element.</audio>
+            <audio controls src="assets/S11_1.m4a">Your browser does not support the audio element.</audio>
         </div>
     </section>
 
@@ -462,6 +470,29 @@
 
     // Initial state: all slides visible, no slide mode.
     slides.forEach(slide => slide.style.display = 'flex');
+
+    // KaTeX Auto-rendering
+    // This listener ensures that KaTeX rendering happens after the DOM is fully loaded
+    // and after the deferred KaTeX scripts (katex.min.js and auto-render.min.js) have executed.
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof renderMathInElement === 'function') {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},  // For block-level display math
+                    {left: "$", right: "$", display: false}    // For inline math
+                    // Note: Your document currently uses $...$ for all math expressions.
+                    // With this configuration, they will be rendered as inline math.
+                    // If you intend for formulas within <div class="formula"> to be
+                    // display-style (e.g., with larger fractions), you should change
+                    // their content from $formula$ to $$formula$$.
+                ],
+                throwOnError: false // Prevents a single error from stopping all rendering
+            });
+        } else {
+            console.error("KaTeX auto-render function (renderMathInElement) was not found. " +
+                          "Ensure KaTeX and its auto-render extension are loaded correctly from the CDN.");
+        }
+    });
 
 </script>
 </body>

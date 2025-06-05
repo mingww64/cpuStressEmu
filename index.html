@@ -257,6 +257,7 @@
                     <button id="guideSkipButton" class="text-slate-500 hover:text-slate-700 font-medium py-2 px-4 rounded-lg mr-2 transition-colors">Skip</button>
                     <button id="guideNextButton" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">Next</button>
                     <button id="guideDoneButton" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors" style="display: none;">Done</button>
+                    <button id="guideViewDemoButton" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg ml-2 transition-colors" style="display: none;">View Demo</button>
                 </div>
             </div>
         </div>
@@ -288,7 +289,7 @@
 
         // Page Guide Elements & State
         let pageGuideModal, guideSlideTitle, guideSlideContent, guidePrevButton, guideNextButton, guideSkipButton, guideDoneButton, guideSlideIndicator;
-        let currentDemoSlideIndex = 0;
+        let guideViewDemoButton, currentDemoSlideIndex = 0;
         const localStorageKeyDemoSeen = 'cpuStressEmuDemoSeen_v1.0'; // Versioned key
         
         // Define model functions after modelParams is declared, and before demoSlides
@@ -632,6 +633,7 @@
             guideSkipButton = document.getElementById('guideSkipButton');
             guideDoneButton = document.getElementById('guideDoneButton');
             guideSlideIndicator = document.getElementById('guideSlideIndicator');
+            guideViewDemoButton = document.getElementById('guideViewDemoButton');
 
             detailsMarkdownHostDiv = document.getElementById('detailsMarkdownHost');
             detailsFallbackMessageP = document.getElementById('detailsFallbackMessage');
@@ -684,9 +686,11 @@
                 if (currentDemoSlideIndex === demoSlides.length - 1) {
                     guideNextButton.style.display = 'none';
                     guideDoneButton.style.display = 'inline-block';
+                    guideViewDemoButton.style.display = 'inline-block';
                 } else {
                     guideNextButton.style.display = 'inline-block';
                     guideDoneButton.style.display = 'none';
+                    guideViewDemoButton.style.display = 'none';
                 }
             }
 
@@ -781,6 +785,7 @@
             });
             if(guideSkipButton) guideSkipButton.addEventListener('click', dismissPageGuide);
             if(guideDoneButton) guideDoneButton.addEventListener('click', dismissPageGuide);
+            if(guideViewDemoButton) guideViewDemoButton.addEventListener('click', () => { window.location.href = 'demo.html'; });
 
             dismissHeatTransferIntroButton.addEventListener('click', () => {
                 heatTransferIntroDismissed = true;

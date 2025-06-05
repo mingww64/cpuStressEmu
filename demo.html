@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Thermal Experiment Presentation</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .presentation { width: 90%; max-width: 1000px; background-color: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .slide { padding: 40px; border-bottom: 1px solid #ddd; min-height: 400px; display: flex; flex-direction: column; justify-content: center; }
+        .slide:last-child { border-bottom: none; }
+        h1, h2, h3 { color: #333; }
+        h1 { font-size: 2.5em; text-align: center; margin-bottom: 20px; }
+        h2 { font-size: 1.8em; color: #0056b3; margin-bottom: 15px; border-bottom: 2px solid #0056b3; padding-bottom: 5px;}
+        h3 { font-size: 1.4em; color: #007bff; margin-top: 20px; }
+        p, li { font-size: 1.1em; line-height: 1.6; color: #555; }
+        ul { list-style-type: disc; padding-left: 20px; }
+        code { background-color: #e8e8e8; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.3em;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        .visual-cue-note {
+            font-style: italic;
+            color: #888;
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-left: 3px solid #87cefa;
+            margin-top: 15px;
+            border-radius: 3px;
+        }
+        .audio-controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .audio-controls audio {
+            width: 80%;
+            max-width: 400px;
+            margin-top: 5px; /* Add some space between multiple audio players */
+        }
+        .slide-navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 100;
+        }
+        .slide-navigation button {
+            background-color: #fff;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .slide-navigation button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #slideModeToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;
+        }
+        .slide-image {
+            max-width: 80%;
+            margin: 20px auto;
+            display: block;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .slide-image-multiple {
+            max-width: 70%;
+            margin: 15px auto;
+            display: block;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation">
+    <button id="slideModeToggle">Enter Slide Mode</button>
+
+    <!-- Slide 1: Title -->
+    <section class="slide">
+        <h1>CPU Thermal Characteristics & Resistance Model</h1>
+        <p style="text-align:center;">An Experimental Analysis</p>
+        <img src="assets/s1.png" alt="CPU Thermal Experiment Title Graphic" class="slide-image">
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S1.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 2: Objective -->
+    <section class="slide">
+        <h2>1. Objective</h2>
+        <ul>
+            <li>To investigate the thermal characteristics of a CPU cooling solution under different Package Power Target (PPT) limits.</li>
+            <li>To maintain a consistent computational load during tests.</li>
+            <li>Key Outcome: Develop a thermal resistance model for the specific cooling solution.</li>
+        </ul>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S2.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 3: System and Hardware -->
+    <section class="slide">
+        <h2>2. System and Hardware</h2>
+        <ul>
+            <li><strong>CPU:</strong> AMD Ryzen 4650G
+                <ul>
+                    <li>65W TDP (observed max ~51W in this experiment)</li>
+                </ul>
+            </li>
+            <li><strong>Cooler:</strong> Noctua NH-L9a Fan & Heatsink</li>
+        </ul>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S3.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 4: Configuration & Control Software -->
+    <section class="slide">
+        <h2>3. Configuration & Control</h2>
+        <h3>3.1. Orchestration</h3>
+        <p>Experiment orchestrated using a BASH script: <code>emu.sh</code>.</p>
+        <img src="assets/Actual_PPT_vs_Set_PPT.png" alt="Actual PPT vs Set PPT Chart" class="slide-image">
+
+        <h3>3.2. Sensor Monitoring</h3>
+        <ul>
+            <li><strong>CPU Temperature & Power:</strong> Kernel module <code>ryzen_smu</code> with <code>ryzen_monitor</code> utility.</li>
+            <li><strong>CPU Fan RPM:</strong> <code>hwmon</code> interface.</li>
+        </ul>
+
+        <h3>3.3. CPU Power Control (PPT)</h3>
+        <ul>
+            <li><strong>Utility:</strong> <code>ryzen_monitor</code></li>
+            <li><strong>Argument Format:</strong> <code>--set-ppt=VALUE</code></li>
+            <li><strong>PPT Values Tested:</strong> 15W to 55W (1W increments).</li>
+        </ul>
+
+        <h3>3.4. CPU Load Generation</h3>
+        <ul>
+            <li><strong>Tool:</strong> <code>mprime</code> (stress test)</li>
+            <li><strong>Configuration:</strong> 6 threads (consistent across all PPT tests).</li>
+        </ul>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S4.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 5: Test Protocol -->
+    <section class="slide">
+        <h2>4. Test Protocol</h2>
+        <p>Summary for each PPT value tested:</p>
+        <ul>
+            <li><strong>Warm-up Duration:</strong> 30 seconds</li>
+            <li><strong>Measurement Duration:</strong> 30 seconds</li>
+            <li><strong>Cool-down Duration:</strong> 0 seconds (due to incremental PPT increases)</li>
+            <li><strong>Sampling Interval:</strong> 1 second</li>
+            <li><strong>Ambient Temperature (start):</strong> 22.8 °C (monitored, assumed constant for calculation per data point)</li>
+            <li><strong>Output:</strong> <code>cpu_cooling_data_controlled.csv</code></li>
+        </ul>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/s5_1.m4a">Your browser does not support the audio element.</audio>
+            <audio controls src="assets/S5_2.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 6: Procedure Summary -->
+    <section class="slide">
+        <h2>5. Procedure Summary</h2>
+        <ol>
+            <li>Set CPU PPT limit (<code>ryzen_monitor</code>).</li>
+            <li>Start <code>mprime</code> load (6 threads).</li>
+            <li>Wait for warm-up (30s).</li>
+            <li>During measurement (30s), record at 1s intervals:
+                <ul>
+                    <li>CPU Temperature ($T_{case}$)</li>
+                    <li>CPU Power ($P_{cpu}$)</li>
+                    <li>CPU Fan RPM</li>
+                    <li>Ambient Temperature ($T_{ambient}$)</li>
+                </ul>
+            </li>
+            <li>Stop <code>mprime</code>.</li>
+            <li>Repeat for the next PPT value (15W to 55W).</li>
+            <li>Reset CPU PPT after all tests.</li>
+        </ol>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S6.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 7: Thermal Resistance Calculation -->
+    <section class="slide">
+        <h2>6. Thermal Resistance Model Development</h2>
+        <h3>6.1. Thermal Resistance ($R_{th}$) Calculation</h3>
+        <p>For each data point, overall thermal resistance was calculated as:</p>
+        <div class="formula">
+            $R_{th} = (T_{case} - T_{ambient}) / P_{cpu}$
+        </div>
+        <p>Where:</p>
+        <ul>
+            <li>$T_{case}$: CPU temperature (°C)</li>
+            <li>$T_{ambient}$: Intake air temperature (°C)</li>
+            <li>$P_{cpu}$: Actual CPU power consumed (W)</li>
+        </ul>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S7.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 8: Physics-Informed Model Structure -->
+    <section class="slide">
+        <h3>6.2. Physics-Informed Model Structure</h3>
+        <p>The relationship between thermal resistance and CPU fan RPM is modeled as:</p>
+        <div class="formula">
+            $R_{th}(RPM) = R_{fixed} + C / RPM^n$
+        </div>
+        <p>Where:</p>
+        <ul>
+            <li><strong>$R_{fixed}$</strong>: Airflow-independent thermal resistances (TIMs, IHS, cooler baseplate).</li>
+            <li><strong>$C / RPM^n$</strong>: Airflow-dependent convective thermal resistance (heatsink fins to air).
+                <ul>
+                    <li><strong>$C$</strong>: Constant (heatsink geometry, material, air properties).</li>
+                    <li><strong>$n$</strong>: Exponent (characterizes airflow-convection relationship, typically 0.5-0.8).</li>
+                </ul>
+            </li>
+        </ul>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S8_1.m4a">Your browser does not support the audio element.</audio>
+            <audio controls src="assets/S8_2.m4a">Your browser does not support the audio element.</audio>
+            <audio controls src="assets/S8.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 9: Model Fitting -->
+    <section class="slide">
+        <h3>6.3. Model Fitting</h3>
+        <p>Parameters ($R_{fixed}$, $C$, $n$) were determined by fitting the model to experimental (RPM, $R_{th}$) data using non-linear least squares regression (<code>scipy.optimize.curve_fit</code>).</p>
+        <p><strong>Fitted Parameters (Approximate):</strong></p>
+        <ul>
+            <li>$R_{fixed} \approx 0.0000 \, °C/W$</li>
+            <li>$C \approx 12.0157$</li>
+            <li>$n \approx 0.3467$</li>
+        </ul>
+        <img src="assets/thermal_resistance_model_fit.png" alt="Thermal Resistance Model Fit" class="slide-image">
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S9.m4a">Your browser does not support the audio element.</audio>
+                    <li>Define parameter bounds (e.g., $R_{fixed} \ge 0$, $C \ge 0$, $0.1 \le n \le 1.5$).</li>
+                </ul>
+            </li>
+            <li><strong>Perform Curve Fitting:</strong> Use non-linear least squares (e.g., <code>scipy.optimize.curve_fit</code>) to find optimal $R_{fixed}$, $C$, $n$.</li>
+            <li><strong>Plot Results:</strong> Visualize experimental data against the fitted model.</li>
+            <li><strong>"Sweet Spot" Analysis (Optional):</strong> Analyze the derivative $dR_{th}/d(RPM)$ to find points of diminishing returns.</li>
+        </ol>
+        <img src="assets/Temp_vs_Power.png" alt="Temperature vs Power Chart" class="slide-image-multiple">
+        <img src="assets/Temp_vs_RPM.png" alt="Temperature vs RPM Chart" class="slide-image-multiple">
+        <img src="assets/Key_Variables_Distribution.png" alt="Key Variables Distribution Chart" class="slide-image-multiple">
+        <p><em>(Detailed pseudo-code available in <code>exp.md</code>)</em></p>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S9.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 11: Final Model Equation & Interpretation -->
+    <section class="slide">
+        <h3>Resulting Model Equation</h3>
+        <div class="formula">
+            $R_{th}(RPM) \approx 12.0157 / RPM^{0.3467}$
+        </div>
+        <p><strong>Interpretation:</strong></p>
+        <ul>
+            <li><strong>$R_{fixed} \approx 0.0000 \, °C/W$:</strong> Suggests that airflow-dependent convective resistance is dominant for this cooler. Fixed resistances are minimal or absorbed into the convective term by the fitting process.</li>
+            <li><strong>$n \approx 0.3467$:</strong> Indicates the sensitivity of the cooler's performance to changes in fan speed. This value is somewhat lower than typical theoretical ranges (0.5-0.8), which might suggest flow characteristics specific to this heatsink/fan combination at the tested RPMs.</li>
+        </ul>
+        <div class="audio-controls">
+            <p><em>Slide Audio:</em></p>
+            <audio controls src="assets/S11_1.m4a">Your browser does not support the audio element.</audio>
+            <audio controls src="assets/S11.m4a">Your browser does not support the audio element.</audio>
+        </div>
+    </section>
+
+    <!-- Slide 12: "Sweet Spot" Analysis (from fit.py) -->
+    <section class="slide">
+        <h2>"Sweet Spot" Analysis</h2>
+        <p>The derivative of the thermal resistance model, $dR_{th}/d(RPM)$, helps identify the "sweet spot" where increasing fan RPM yields diminishing returns in cooling performance.</p>
+        <div class="formula">
+             $d(R_{th})/d(RPM) = -n \cdot C \cdot RPM^{(-n-1)}$
+        </div>
+        <ul>
+            <li>A potential "sweet spot" was identified around <strong>~1100-1200 RPM</strong> (based on derivative analysis in <code>fit.py</code>).</li>
+            <li>Beyond this, improvements in $R_{th}$ per additional RPM become significantly smaller.</li>
+            <li>This helps balance cooling performance with noise and fan longevity.</li>
+        </ul>
+        <img src="assets/thermal_resistance_derivative.png" alt="Thermal Resistance Derivative - Sweet Spot Analysis" class="slide-image">
+    </section>
+
+    <!-- Slide 13: Conclusions -->
+    <section class="slide">
+        <h2>Conclusions & Key Takeaways</h2>
+        <ul>
+            <li>Successfully characterized the thermal performance of the Noctua NH-L9a cooler on an AMD Ryzen 4650G.</li>
+            <li>Developed a physics-informed model: $R_{th}(RPM) \approx 12.0157 / RPM^{0.3467}$.</li>
+            <li>The model indicates that convective thermal resistance is the dominant factor for this cooler setup.</li>
+            <li>The exponent $n \approx 0.35$ quantifies the fan speed's impact on cooling.</li>
+            <li>"Sweet spot" analysis suggests optimal RPM ranges for balancing performance and noise/power.</li>
+        </ul>
+    </section>
+
+    <!-- Slide 14: Questions / Further Work -->
+    <section class="slide">
+        <h2>Questions & Further Work</h2>
+        <p style="text-align:center; font-size: 2em; margin-top: 50px;">?</p>
+        <h3>Potential Further Work:</h3>
+        <ul>
+            <li>Investigate the impact of different Thermal Interface Materials (TIMs).</li>
+            <li>Analyze the effect of chassis airflow and ambient temperature variations more broadly.</li>
+            <li>Compare with other low-profile coolers.</li>
+            <li>Explore the model's accuracy at extreme RPM ranges.</li>
+        </ul>
+    </section>
+
+</div>
+<div class="slide-navigation" style="display: none;">
+    <button id="prevSlide">Previous</button>
+    <button id="nextSlide">Next</button>
+</div>
+
+<script>
+    const slides = Array.from(document.querySelectorAll('.presentation .slide'));
+    const slideModeToggle = document.getElementById('slideModeToggle');
+    const prevSlideButton = document.getElementById('prevSlide');
+    const nextSlideButton = document.getElementById('nextSlide');
+    const slideNavigationControls = document.querySelector('.slide-navigation');
+
+    let currentSlideIndex = 0;
+    let isSlideModeActive = false;
+    let currentSlideAudios = [];
+    let currentAudioIndexToPlay = 0;
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.style.display = i === index ? 'flex' : 'none';
+        });
+        currentSlideIndex = index;
+        // Scroll to top of the page
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+
+        if (isSlideModeActive) {
+            updateSlideNavButtons();
+            playAudiosForCurrentSlide();
+        }
+    }
+
+    function updateSlideNavButtons() {
+        prevSlideButton.disabled = currentSlideIndex === 0;
+        nextSlideButton.disabled = currentSlideIndex === slides.length - 1;
+    }
+
+    function getOrderedAudiosForSlide(slideElement) {
+        const audioElements = Array.from(slideElement.querySelectorAll('audio'));
+        // Sort audio: Base name (e.g., S8.m4a) first, then _1, _2, etc.
+        audioElements.sort((a, b) => {
+            const srcA = a.getAttribute('src').split('/').pop(); // Get filename
+            const srcB = b.getAttribute('src').split('/').pop();
+
+            const isBaseA = !srcA.includes('_');
+            const isBaseB = !srcB.includes('_');
+
+            if (isBaseA && !isBaseB) return -1; // Base A comes before suffixed B
+            if (!isBaseA && isBaseB) return 1;  // Suffixed A comes after base B
+
+            // If both are base or both are suffixed, sort alphabetically (which handles _1, _2)
+            return srcA.localeCompare(srcB);
+        });
+        return audioElements;
+    }
+
+    function playNextAudioInSequence() {
+        if (currentAudioIndexToPlay < currentSlideAudios.length) {
+            const audioToPlay = currentSlideAudios[currentAudioIndexToPlay];
+            audioToPlay.currentTime = 0;
+            audioToPlay.play().catch(e => console.error("Error playing audio:", audioToPlay.src, e));
+            // Set up the next one
+            audioToPlay.onended = () => {
+                if (isSlideModeActive) { // Only proceed if still in slide mode
+                    currentAudioIndexToPlay++;
+                    playNextAudioInSequence();
+                }
+            };
+        }
+    }
+
+    function playAudiosForCurrentSlide() {
+        stopAllAudios(); // Stop audios from previous slide
+        currentSlideAudios = getOrderedAudiosForSlide(slides[currentSlideIndex]);
+        currentAudioIndexToPlay = 0;
+        
+        if (currentSlideAudios.length > 0) {
+            playNextAudioInSequence();
+        }
+    }
+
+    function stopAllAudios() {
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.onended = null; // Remove event listener to prevent auto-advancing
+        });
+    }
+
+    slideModeToggle.addEventListener('click', () => {
+        isSlideModeActive = !isSlideModeActive;
+        if (isSlideModeActive) {
+            slideModeToggle.textContent = 'Exit Slide Mode';
+            slideNavigationControls.style.display = 'flex';
+            slides.forEach(s => s.querySelectorAll('.audio-controls').forEach(ac => ac.style.display = 'none')); // Hide individual controls
+            showSlide(0); // Start from the first slide
+        } else {
+            slideModeToggle.textContent = 'Enter Slide Mode';
+            slideNavigationControls.style.display = 'none';
+            slides.forEach(s => s.querySelectorAll('.audio-controls').forEach(ac => ac.style.display = 'block')); // Show individual controls
+            stopAllAudios();
+            // Restore view to the current slide, but not in "slide mode" (all slides visible or as per default)
+            slides.forEach((slide, i) => slide.style.display = 'flex'); // Show all slides
+            slides[currentSlideIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+
+    prevSlideButton.addEventListener('click', () => {
+        if (currentSlideIndex > 0) showSlide(currentSlideIndex - 1);
+    });
+
+    nextSlideButton.addEventListener('click', () => {
+        if (currentSlideIndex < slides.length - 1) showSlide(currentSlideIndex + 1);
+    });
+
+    // Initial state: all slides visible, no slide mode.
+    slides.forEach(slide => slide.style.display = 'flex');
+
+</script>
+</body>
+</html>
